@@ -1,16 +1,235 @@
 <!DOCTYPE html>
-<body>
-    <p>
-        Sebelum submit lakukan inspect element dan ganti &lt; episode-id &gt; atau &lt; program-url &gt; di form action dengan value yang sesuai.<br>
-        Input type hidden juga bisa diganti valuenya.
-    </p>
-    <form method="POST" action="https://podcast-staging.kaskus.co.id/episode/delete/<episode-id>">
-        <input type="hidden" name="token" value="">
-        <button>Delete Episode</button>
-    </form>
-    <br>
-    <form method="POST" action="https://podcast-staging.kaskus.co.id/program/delete/<program-url>">
-        <input type="hidden" name="token" value="">
-        <button>Delete Program</button>
-    </form>
-</body>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Diagram Selector</title>
+    <link rel="stylesheet" href="https://matcha.mizu.sh/matcha.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11.1.0/dist/mermaid.min.js"></script>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .button-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      .view-container {
+        display: flex;
+        justify-content: flex-end;
+      }
+      button {
+        padding: 10px 15px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      #diagram-container {
+        border: 1px solid #ccc;
+        padding: 20px;
+        min-height: 300px;
+      }
+    </style>
+  </head>
+  <body data-color-scheme="light">
+    <h1>Diagram Selector</h1>
+
+    <div class="button-container">
+      <button onclick="selectDiagram('architecture')">
+        Architecture Diagram
+      </button>
+      <button onclick="selectDiagram('block')">Block Diagram</button>
+      <button onclick="selectDiagram('c4')">C4 Diagram</button>
+      <button onclick="selectDiagram('class')">Class Diagram</button>
+      <button onclick="selectDiagram('erd')">
+        Entity-Relationship Diagram
+      </button>
+      <button onclick="selectDiagram('flowchart')">Flowchart</button>
+      <button onclick="selectDiagram('gantt')">Gantt Chart</button>
+      <button onclick="selectDiagram('git')">Git Graph</button>
+      <button onclick="selectDiagram('mindmap')">Mindmap</button>
+      <button onclick="selectDiagram('packet')">Packet Diagram</button>
+      <button onclick="selectDiagram('pie')">Pie Chart</button>
+      <button onclick="selectDiagram('quadrant')">Quadrant Diagram</button>
+      <button onclick="selectDiagram('requirement')">
+        Requirement Diagram
+      </button>
+      <button onclick="selectDiagram('sankey')">Sankey Diagram</button>
+      <button onclick="selectDiagram('sequence')">Sequence Diagram</button>
+      <button onclick="selectDiagram('state')">State Diagram</button>
+      <button onclick="selectDiagram('timeline')">Timeline Diagram</button>
+      <button onclick="selectDiagram('user_journey')">
+        User Journey Diagram
+      </button>
+      <button onclick="selectDiagram('xy')">XY Diagram</button>
+      <button onclick="selectDiagram('custom')">Write your own</button>
+    </div>
+
+    <textarea
+      id="custom-input"
+      style="display: none; padding: 10px; min-height: 200px"
+      placeholder="Enter your Mermaid diagram syntax here..."
+    ></textarea>
+
+    <div class="view-container">
+      <button
+        id="btn-view-diagram"
+        class="fg-accent"
+        onclick="viewMode('diagram')"
+      >
+        Diagram
+      </button>
+      <button id="btn-view-syntax" onclick="viewMode('syntax')">Syntax</button>
+      <button id="btn-copy-syntax" class="bd-active" onclick="copySyntax()">
+        Copy Syntax
+      </button>
+    </div>
+
+    <div id="diagram-container">
+      <p>Select a diagram type to display here.</p>
+    </div>
+
+    <script>
+      let selectedType = null;
+      let selectedView = "diagram";
+      mermaid.initialize({ startOnLoad: true });
+
+      document
+        .getElementById("custom-input")
+        .addEventListener("input", renderCustomDiagram);
+
+      async function getDiagramDefintion() {
+        const response = await fetch(`diagrams/${selectedType}.mermaid`);
+        return response.text();
+      }
+
+      function selectDiagram(diagramType) {
+        selectedType = diagramType;
+        if (selectedType === "custom") {
+          document.getElementById("custom-input").style.display = "block";
+          renderCustomDiagram();
+        } else {
+          document.getElementById("custom-input").style.display = "none";
+          document.getElementById("custom-input").value = "";
+          renderDiagram();
+        }
+      }
+
+      async function renderDiagram() {
+        const container = document.getElementById("diagram-container");
+
+        try {
+          const mermaidDefinition = await getDiagramDefintion();
+          if (selectedView === "syntax") {
+            container.innerHTML = "<pre>" + mermaidDefinition + "</pre>";
+            return;
+          }
+
+          container.innerHTML = `<div class="mermaid">${mermaidDefinition}</div>`;
+          mermaid.init(undefined, document.querySelector(".mermaid"));
+        } catch (error) {
+          console.error("Error loading flowchart:", error);
+          container.innerHTML =
+            "<p>Error loading flowchart. Please check the console for details.</p>";
+        }
+      }
+
+      async function renderCustomDiagram() {
+        const container = document.getElementById("diagram-container");
+        const customInput = document.getElementById("custom-input");
+        const mermaidDefinition = customInput.value;
+
+        if (!mermaidDefinition) {
+          container.innerHTML =
+            "<p>Enter your Mermaid diagram syntax above.</p>";
+          return;
+        }
+
+        const isValidMermaid = await mermaid.parse(mermaidDefinition, {
+          suppressErrors: true,
+        });
+
+        if (!isValidMermaid) {
+          container.innerHTML = "<p>Invalid Mermaid diagram syntax.</p>";
+          return;
+        }
+
+        if (selectedView === "syntax") {
+          container.innerHTML = "<pre>" + mermaidDefinition + "</pre>";
+          return;
+        }
+
+        try {
+          container.innerHTML = `<div class="mermaid">${mermaidDefinition}</div>`;
+          mermaid.init(undefined, document.querySelector(".mermaid"));
+        } catch (error) {
+          console.error("Error rendering custom diagram:", error);
+          container.innerHTML =
+            "<p>Error rendering custom diagram. Please check the console for details.</p>";
+        }
+      }
+
+      async function viewMode(viewType) {
+        if (selectedType === null) {
+          alert("Please select a diagram type first.");
+          return;
+        }
+        selectedView = viewType;
+
+        document
+          .getElementById("btn-view-diagram")
+          .classList.remove("fg-accent");
+        document
+          .getElementById("btn-view-syntax")
+          .classList.remove("fg-accent");
+
+        document
+          .getElementById("btn-view-" + viewType)
+          .classList.add("fg-accent");
+
+        if (selectedView === "diagram") {
+          if (selectedType === "custom") {
+            renderCustomDiagram();
+          } else {
+            renderDiagram();
+          }
+
+          return;
+        }
+
+        const container = document.getElementById("diagram-container");
+
+        if (selectedType === "custom") {
+          const customInput = document.getElementById("custom-input");
+          container.innerHTML = "<pre>" + customInput.value + "</pre>";
+
+          return;
+        }
+
+        const mermaidDefinition = await getDiagramDefintion();
+        container.innerHTML = "<pre>" + mermaidDefinition + "</pre>";
+      }
+
+      async function copySyntax() {
+        if (selectedType === null) {
+          alert("Please select a diagram type first.");
+          return;
+        }
+
+        if (selectedView === "custom") {
+          const customInput = document.getElementById("custom-input");
+          customInput.select();
+          document.execCommand("copy");
+        } else {
+          const mermaidDefinition = await getDiagramDefintion();
+          navigator.clipboard.writeText(mermaidDefinition);
+        }
+      }
+    </script>
+  </body>
+</html>
