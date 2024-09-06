@@ -20,11 +20,20 @@
         gap: 10px;
         margin-bottom: 20px;
       }
-      .header {
+      .diagram-header {
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
-        justify-content: flex-end;
-        height: 50px;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .diagram-type-container {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+      }
+      .diagram-action-container {
+        display: flex;
         gap: 8px;
       }
       button {
@@ -108,20 +117,26 @@
       placeholder="Enter your Mermaid diagram syntax here..."
     ></textarea>
 
-    <div class="header">
-      <h3>Diagram type:</h3>
-      <code id="diagram-type">-</code>
-      <button
-        id="btn-view-diagram"
-        class="fg-accent"
-        onclick="viewMode('diagram')"
-      >
-        Diagram
-      </button>
-      <button id="btn-view-syntax" onclick="viewMode('syntax')">Syntax</button>
-      <button id="btn-copy-syntax" class="bd-active" onclick="copySyntax()">
-        Copy Syntax
-      </button>
+    <div class="diagram-header">
+      <div class="diagram-type-container">
+        <h3>Diagram type:</h3>
+        <code id="diagram-type">-</code>
+      </div>
+      <div class="diagram-action-container">
+        <button
+          id="btn-view-diagram"
+          class="fg-accent"
+          onclick="viewMode('diagram')"
+        >
+          Diagram
+        </button>
+        <button id="btn-view-syntax" onclick="viewMode('syntax')">
+          Syntax
+        </button>
+        <button id="btn-copy-syntax" class="bd-active" onclick="copySyntax()">
+          Copy Syntax
+        </button>
+      </div>
     </div>
 
     <div id="diagram-container">
