@@ -20,56 +20,86 @@
         gap: 10px;
         margin-bottom: 20px;
       }
-      .view-container {
+      .header {
         display: flex;
+        align-items: center;
         justify-content: flex-end;
+        height: 50px;
+        gap: 8px;
       }
       button {
         padding: 10px 15px;
         font-size: 14px;
         cursor: pointer;
       }
-      #diagram-container {
+      #diagram-container,
+      #syntax-container {
         border: 1px solid #ccc;
         padding: 20px;
         min-height: 300px;
       }
+      #diagram-type {
+        margin-right: auto;
+      }
     </style>
   </head>
   <body data-color-scheme="light">
-    <h1>Diagram Selector</h1>
+    <h1 id="title">Mermaid Simple Demo</h1>
     <h2>Pick diagram type</h2>
 
     <div class="button-container">
       <button id="btn-architecture" onclick="selectDiagram('architecture')">
-      Architecture Diagram
+        Architecture Diagram
       </button>
-      <button id="btn-block" onclick="selectDiagram('block')">Block Diagram</button>
+      <button id="btn-block" onclick="selectDiagram('block')">
+        Block Diagram
+      </button>
       <button id="btn-c4" onclick="selectDiagram('c4')">C4 Diagram</button>
-      <button id="btn-class" onclick="selectDiagram('class')">Class Diagram</button>
+      <button id="btn-class" onclick="selectDiagram('class')">
+        Class Diagram
+      </button>
       <button id="btn-erd" onclick="selectDiagram('erd')">
-      Entity-Relationship Diagram
+        Entity-Relationship Diagram
       </button>
-      <button id="btn-flowchart" onclick="selectDiagram('flowchart')">Flowchart</button>
-      <button id="btn-gantt" onclick="selectDiagram('gantt')">Gantt Chart</button>
+      <button id="btn-flowchart" onclick="selectDiagram('flowchart')">
+        Flowchart
+      </button>
+      <button id="btn-gantt" onclick="selectDiagram('gantt')">
+        Gantt Chart
+      </button>
       <button id="btn-git" onclick="selectDiagram('git')">Git Graph</button>
-      <button id="btn-mindmap" onclick="selectDiagram('mindmap')">Mindmap</button>
-      <button id="btn-packet" onclick="selectDiagram('packet')">Packet Diagram</button>
-      <button id="btn-pie" onclick="selectDiagram('pie')">Pie Chart</button>
-      <button id="btn-quadrant" onclick="selectDiagram('quadrant')">Quadrant Diagram</button>
-      <button id="btn-requirement" onclick="selectDiagram('requirement')">
-      Requirement Diagram
+      <button id="btn-mindmap" onclick="selectDiagram('mindmap')">
+        Mindmap
       </button>
-      <button id="btn-sankey" onclick="selectDiagram('sankey')">Sankey Diagram</button>
-      <button id="btn-sequence" onclick="selectDiagram('sequence')">Sequence Diagram</button>
-      <button id="btn-state" onclick="selectDiagram('state')">State Diagram</button>
-      <button id="btn-timeline" onclick="selectDiagram('timeline')">Timeline Diagram</button>
+      <button id="btn-packet" onclick="selectDiagram('packet')">
+        Packet Diagram
+      </button>
+      <button id="btn-pie" onclick="selectDiagram('pie')">Pie Chart</button>
+      <button id="btn-quadrant" onclick="selectDiagram('quadrant')">
+        Quadrant Diagram
+      </button>
+      <button id="btn-requirement" onclick="selectDiagram('requirement')">
+        Requirement Diagram
+      </button>
+      <button id="btn-sankey" onclick="selectDiagram('sankey')">
+        Sankey Diagram
+      </button>
+      <button id="btn-sequence" onclick="selectDiagram('sequence')">
+        Sequence Diagram
+      </button>
+      <button id="btn-state" onclick="selectDiagram('state')">
+        State Diagram
+      </button>
+      <button id="btn-timeline" onclick="selectDiagram('timeline')">
+        Timeline Diagram
+      </button>
       <button id="btn-user_journey" onclick="selectDiagram('user_journey')">
-      User Journey Diagram
+        User Journey Diagram
       </button>
       <button id="btn-xy" onclick="selectDiagram('xy')">XY Diagram</button>
-      <button id="btn-custom" onclick="selectDiagram('custom')">Write your own</button>
-    </div>
+      <button id="btn-custom" onclick="selectDiagram('custom')">
+        Write your own
+      </button>
     </div>
 
     <textarea
@@ -78,7 +108,9 @@
       placeholder="Enter your Mermaid diagram syntax here..."
     ></textarea>
 
-    <div class="view-container">
+    <div class="header">
+      <h3>Diagram type:</h3>
+      <code id="diagram-type">-</code>
       <button
         id="btn-view-diagram"
         class="fg-accent"
@@ -96,156 +128,47 @@
       <p>Select a diagram type to display here.</p>
     </div>
 
+    <div id="syntax-container" style="display: none">
+      <p>View the diagram syntax here.</p>
+    </div>
+
     <script>
       let selectedType = "flowchart";
       let selectedView = "diagram";
-      mermaid.initialize({ startOnLoad: true });
 
-      document
-        .getElementById("custom-input")
-        .addEventListener("input", renderCustomDiagram);
+      mermaid.initialize({ startOnLoad: false, securityLevel: "loose" });
 
-      document.addEventListener("DOMContentLoaded", function() {
+      document.addEventListener("DOMContentLoaded", function () {
         selectDiagram("flowchart");
+        initCustomListener();
       });
-
-      function styleSelectedButton(diagramType) {
-        // clear all button styles under button-container
-        const buttons = document.querySelectorAll(".button-container button");
-        buttons.forEach((button) => button.classList.remove("fg-accent"));
-
-        const selectedButton = document.getElementById(`btn-${diagramType}`);
-        selectedButton.classList.add("fg-accent");
-      }
-
-      async function getDiagramDefintion() {
-        const response = await fetch(`diagrams/${selectedType}.mermaid`);
-        return response.text();
-      }
 
       function selectDiagram(diagramType) {
         selectedType = diagramType;
         styleSelectedButton(diagramType);
-        if (selectedType === "custom") {
-          document.getElementById("custom-input").style.display = "block";
-          renderCustomDiagram();
-        } else {
-          document.getElementById("custom-input").style.display = "none";
-          document.getElementById("custom-input").value = "";
-          renderDiagram();
-        }
-      }
-
-      async function renderDiagram() {
-        const container = document.getElementById("diagram-container");
-
-        try {
-          const mermaidDefinition = await getDiagramDefintion();
-          if (selectedView === "syntax") {
-            container.innerHTML = "<pre>" + mermaidDefinition + "</pre>";
-            return;
-          }
-
-          container.innerHTML = `<div class="mermaid">${mermaidDefinition}</div>`;
-          mermaid.init(undefined, document.querySelector(".mermaid"));
-        } catch (error) {
-          console.error("Error loading flowchart:", error);
-          container.innerHTML =
-            "<p>Error loading flowchart. Please check the console for details.</p>";
-        }
-      }
-
-      async function renderCustomDiagram() {
-        const container = document.getElementById("diagram-container");
-        const customInput = document.getElementById("custom-input");
-        const mermaidDefinition = customInput.value;
-
-        if (!mermaidDefinition) {
-          container.innerHTML =
-            "<p>Enter your Mermaid diagram syntax above.</p>";
-          return;
-        }
-
-        const isValidMermaid = await mermaid.parse(mermaidDefinition, {
-          suppressErrors: true,
-        });
-
-        if (!isValidMermaid) {
-          container.innerHTML = "<p>Invalid Mermaid diagram syntax.</p>";
-          return;
-        }
-
-        if (selectedView === "syntax") {
-          container.innerHTML = "<pre>" + mermaidDefinition + "</pre>";
-          return;
-        }
-
-        try {
-          container.innerHTML = `<div class="mermaid">${mermaidDefinition}</div>`;
-          mermaid.init(undefined, document.querySelector(".mermaid"));
-        } catch (error) {
-          console.error("Error rendering custom diagram:", error);
-          container.innerHTML =
-            "<p>Error rendering custom diagram. Please check the console for details.</p>";
-        }
-      }
-
-      async function viewMode(viewType) {
-        if (selectedType === null) {
-          alert("Please select a diagram type first.");
-          return;
-        }
-        selectedView = viewType;
-
-        document
-          .getElementById("btn-view-diagram")
-          .classList.remove("fg-accent");
-        document
-          .getElementById("btn-view-syntax")
-          .classList.remove("fg-accent");
-
-        document
-          .getElementById("btn-view-" + viewType)
-          .classList.add("fg-accent");
-
-        if (selectedView === "diagram") {
-          if (selectedType === "custom") {
-            renderCustomDiagram();
-          } else {
-            renderDiagram();
-          }
-
-          return;
-        }
+        hideCustomInput();
 
         const container = document.getElementById("diagram-container");
+        container.innerHTML = "";
+        const syntaxContainer = document.getElementById("syntax-container");
+        syntaxContainer.innerHTML = "";
 
-        if (selectedType === "custom") {
-          const customInput = document.getElementById("custom-input");
-          container.innerHTML = "<pre>" + customInput.value + "</pre>";
-
-          return;
-        }
-
-        const mermaidDefinition = await getDiagramDefintion();
-        container.innerHTML = "<pre>" + mermaidDefinition + "</pre>";
-      }
-
-      async function copySyntax() {
-        if (selectedType === null) {
-          alert("Please select a diagram type first.");
-          return;
-        }
-
-        if (selectedView === "custom") {
-          const customInput = document.getElementById("custom-input");
-          customInput.select();
-          document.execCommand("copy");
-        } else {
-          const mermaidDefinition = await getDiagramDefintion();
-          navigator.clipboard.writeText(mermaidDefinition);
+        switch (diagramType) {
+          case "flowchart":
+            drawFlowchart(container);
+            break;
+          case "custom":
+            drawCustom();
+            break;
+          default:
+            drawDiagram(container);
+            break;
         }
       }
     </script>
+    <script src="main.js"></script>
+    <script src="util.js"></script>
+    <script src="custom.js"></script>
+    <script src="flowchart.js"></script>
   </body>
 </html>
