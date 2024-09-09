@@ -77,8 +77,17 @@
         Gantt Chart
       </button>
       <button id="btn-git" onclick="selectDiagram('git')">Git Graph</button>
+      <button
+        id="btn-knowledge_graph"
+        onclick="selectDiagram('knowledge_graph')"
+      >
+        Knowledge Graph
+      </button>
       <button id="btn-mindmap" onclick="selectDiagram('mindmap')">
         Mindmap
+      </button>
+      <button id="btn-org_chart" onclick="selectDiagram('org_chart')">
+        Organization Chart
       </button>
       <button id="btn-packet" onclick="selectDiagram('packet')">
         Packet Diagram
@@ -119,7 +128,7 @@
 
     <div class="diagram-header">
       <div class="diagram-type-container">
-        <h3>Diagram type:</h3>
+        <h3>Detected diagram type:</h3>
         <code id="diagram-type">-</code>
       </div>
       <div class="diagram-action-container">
@@ -172,6 +181,12 @@
           case "flowchart":
             drawFlowchart(container);
             break;
+          case "knowledge_graph":
+            drawKnowledgeGraph(container);
+            break;
+          case "org_chart":
+            drawOrgchart(container);
+            break;
           case "custom":
             drawCustom();
             break;
@@ -185,5 +200,7 @@
     <script src="util.js"></script>
     <script src="custom.js"></script>
     <script src="flowchart.js"></script>
+    <script src="knowledge_graph.js"></script>
+    <script src="org_chart.js"></script>
   </body>
 </html>
