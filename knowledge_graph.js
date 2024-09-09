@@ -26,8 +26,11 @@ async function drawKnowledgeGraph(container) {
     }
 
     const divDiagramBlock = document.createElement("div");
+    divDiagramBlock.style.display = "flex";
+    divDiagramBlock.style.flexDirection = "column";
+    divDiagramBlock.style.gap = "8px";
     divDiagramBlock.innerHTML = `
-      <div style="display: flex; gap: 8px; flex-direction: row; align-items: baseline">
+      <div style="display: flex; gap: 8px; flex-direction: row; align-items: baseline; flex-wrap: wrap;">
         <h3>${diagram.title}</h3>
         <span>(detected as <code>${diagramType}</code>)</span>
       </div>
